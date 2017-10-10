@@ -237,8 +237,12 @@ fi
 
 #修改/etc/init.d/mysql*.server，设置basedir=/usr/local/mysql/mysql_5.7，datadir=/var/data/mysql/datax
 #通过mysqladmin shutdown可以关闭MySQL实例
+#
 #如果报错Unit mysql.server.service not found
-#执行systemctl enable mysql.server.service
+#执行systemctl start mysql.server.service
+#
+#如果/etc/init.d/mysql.server start启动失败，error.log也没有ERROR
+#执行systemctl restart mysql.server.service
 cp $mysql_install_dir/$mysql_link/support-files/mysql*.server /etc/init.d/$ctrl_script
 
 #启动实例
