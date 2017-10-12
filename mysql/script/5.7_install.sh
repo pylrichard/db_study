@@ -272,7 +272,7 @@ then
         $bin_dir/mysql --connect-expired-password -uroot -p$tmp_password -S/tmp/mysql.sock$num -e"set password='$password';
                                                                                                 create user 'multi_admin'@'localhost' identified by '$password';
                                                                                                 grant shutdown on *.* to 'multi_admin'@'localhost';
-                                                                                                grant all privileges on *.* to 'root'@'127.0.0.1' identified by '$password';"
+                                                                                                grant all privileges on *.* to 'root'@'%' identified by '$password';"
     done
 else
     tmp_password=$(cat $data_dir/data$3/error.log | grep "A temporary password is generated for" | awk -F' ' '{print $NF}')
@@ -284,7 +284,7 @@ else
     $bin_dir/mysql --connect-expired-password -uroot -p$tmp_password -e"set password='$password';
                                                                         create user 'multi_admin'@'localhost' identified by '$password';
                                                                         grant shutdown on *.* to 'multi_admin'@'localhost';
-                                                                        grant all privileges on *.* to 'root'@'127.0.0.1' identified by '$password';"
+                                                                        grant all privileges on *.* to 'root'@'%' identified by '$password';"
 fi
 
 exit
