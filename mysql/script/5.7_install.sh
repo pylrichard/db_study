@@ -79,9 +79,6 @@ then
     exit
 fi
 
-#安装依赖软件包
-apt-get -y install libaio1
-
 mysql_install_dir=/usr/local/mysql
 
 #创建用户组和用户
