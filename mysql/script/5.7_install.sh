@@ -82,16 +82,16 @@ fi
 mysql_install_dir=/usr/local/mysql
 
 #创建用户组和用户
-echo -e "\nmysql group and user check\n"
+echo -e "mysql group and user check"
 
 grpchk=$(cat /etc/group | grep mysql)
 
 #[]中必须有空格，否则报错
 if [ $? -eq 0 ]
 then
-    echo -e "group mysql exists!\n"
+    echo -e "group mysql exists!"
 else
-    echo -e "add group mysql!\n"
+    echo -e "add group mysql!"
     groupadd mysql
 fi
 
@@ -99,15 +99,15 @@ userchk=$(cat /etc/passwd | grep mysql)
 
 if [ $? -eq 0 ]
 then
-    echo -e "user mysql exists!\n"
+    echo -e "user mysql exists!"
 else
-    echo -e "add user mysql!\n"
+    echo -e "add user mysql!"
     #-g表示mysql用户属于mysql用户组
     useradd -r -g mysql mysql
 fi
 
 #拷贝配置文件
-echo -e "copy config file to /etc/mysql/my.cnf!\n"
+echo -e "copy config file to /etc/mysql/my.cnf!"
 cd `dirname $0`
 conf_dir=/etc/mysql
 
@@ -125,10 +125,10 @@ bin_dir=$mysql_install_dir/$mysql_link/bin
 #/usr/local/mysql-5.x.x-linux-glibc2.5-x86_64目录存在则不解压
 if test -d $mysql_install_dir/$mysql_dir
 then
-    echo -e "dir exists!\n"
+    echo -e "dir exists!"
 else
     #解压二进制压缩包
-    echo -e "decompress binary package...\n"
+    echo -e "decompress binary package..."
     mkdir $mysql_install_dir
     tar zxf $1 -C$mysql_install_dir
 
@@ -139,18 +139,18 @@ else
     fi
 
     #创建mysql软链接
-    echo -e "create link...\n"
+    echo -e "create link..."
     ln -s $mysql_dir $mysql_link
 fi
 
 #创建data_dir
 data_dir=/var/data/mysql
-echo -e "check data dir!\n"
+echo -e "check data dir!"
 if test -d $data_dir
 then
-    echo -e "data dir exists\n"
+    echo -e "data dir exists"
 else
-    echo -e "create data dir\n"
+    echo -e "create data dir"
     mkdir -p $data_dir
 fi
 
@@ -178,13 +178,13 @@ function create_mysql_files_dir {
 
 if test -d mysql-files
 then
-    echo -e "mysql-files exists!\n"
+    echo -e "mysql-files exists!"
 else
     create_mysql_files_dir
 fi
 
 function multi_init_mysql {
-    echo -e "multi init 5.7...\n"
+    echo -e "multi init 5.7..."
 
     #$1代表传递给此函数的第1个参数
     for dir_name in data{$1..$2}
@@ -198,7 +198,7 @@ function multi_init_mysql {
 }
 
 function single_init_mysql {
-    echo -e "single init 5.7...\n"
+    echo -e "single init 5.7..."
 
     dir=$data_dir/data$1
     #注意init_data$1.log不能存放在$dir数据目录下，否则会报初始化错误
@@ -244,7 +244,7 @@ fi
 cp $mysql_install_dir/$mysql_link/support-files/mysql*.server /etc/init.d/$ctrl_script
 
 #启动实例
-echo -e "\nstart mysql...\n"
+echo -e "start mysql..."
 if [ $2 = "multi" ]
 then
     $bin_dir/mysqld_multi start
