@@ -14,11 +14,11 @@ function usage_multi() {
 }
 
 function usage_single() {
-    echo "usage: ./5.6_install.sh mysql-5.x.x.tar.gz single"
+    echo "usage: ./5.6_install.sh mysql-5.x.x.tar.gz single datax"
     exit
 }
 
-[ $# = 0 ] || [ $# = 1 ] || [ $# = 3 ] || [ $# -gt 4 ] && usage
+[ $# = 0 ] || [ $# = 1 ] || [ $# -gt 4 ] && usage
 
 if [ $# = 2 ]
 then
@@ -199,7 +199,7 @@ then
     #将数据目录编号作为参数传递
     multi_init_mysql $3 $4
 else
-    single_init_mysql
+    single_init_mysql $3
 fi
 
 chown -R root .
@@ -227,12 +227,16 @@ if [ $2 = "multi" ]
 then
     for num in {$3..$4}
     do
-        $bin_dir/mysql -uroot -S/tmp/mysql.sock$num -e"grant all privileges on *.* to root@'%' identified by '$password' with grant option;
+        $bin_dir/mysql -uroot -S/tmp/mysql.sock$num -e"grant all privileges on *.* to root@'127.0.0.1' identified by '$password' with grant option;
+        					    grant all privileges on *.* to root@'%' identified by '$password' with grant option;
+        					    grant all privileges on *.* to root@'localhost' identified by '$password' with grant option;
                                                     create user 'multi_admin'@'localhost' identified by '$password';
                                                     grant shutdown on *.* to 'multi_admin'@'localhost';";
     done
 else
-    $bin_dir/mysql -uroot -e "grant all privileges on *.* to root@'%' identified by '$password' with grant option;";
+    $bin_dir/mysql -uroot -e "grant all privileges on *.* to root@'localhost' identified by '$password' with grant option;
+        		grant all privileges on *.* to root@'%' identified by '$password' with grant option;
+        		grant all privileges on *.* to root@'127.0.0.1' identified by '$password' with grant option;";
 fi
 
 exit
