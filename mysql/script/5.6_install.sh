@@ -2,6 +2,34 @@
 
 #此脚本需要切换到root下执行
 
+'
+/usr/lib/systemd/下新建system目录
+
+vim /usr/lib/systemd/system/mysql.server.service
+[Unit]
+Description=mysql.server.service
+SourcePath=/etc/init.d/mysql.server
+Before=shutdown.target
+
+[Service]
+User=mysql
+Type=forking
+ExecStart=/etc/init.d/mysql.server start
+ExecStop=/etc/init.d/mysql.server stop
+
+[Install]
+WantedBy=multi-user.target
+
+systemctl daemon-reload
+systemctl start mysql.server.service
+
+查看日志
+journalctl -f
+
+systemctl list-units |grep mysql
+'
+
+#
 #判断脚本执行时所带的参数是否符合规范
 function usage() {
     echo "usage: ./5.6_install.sh mysql-5.x.x.tar.gz single/multi data_start data_end"
