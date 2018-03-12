@@ -33,7 +33,7 @@ function check_param {
     expr $1 + 0 &>/dev/null
     if [ $? -ne 0 ]
     then
-        echo "$1 should be integer" 
+        echo "$1 should be integer"
         exit
     fi
 
@@ -44,14 +44,14 @@ function check_param {
     fi
 }
 
-if [ $# = 3 ] 
+if [ $# = 3 ]
 then
     [ $2 != "single" ] && usage_single
 
     check_param $3
 fi
 
-if [ $# = 4 ] 
+if [ $# = 4 ]
 then
     [ $2 != "multi" ] && usage_multi
 
@@ -102,6 +102,7 @@ then
     echo -e "user mysql exists!\n"
 else
     echo -e "add user mysql!\n"
+    #-g表示mysql用户属于mysql用户组
     useradd -r -g mysql mysql
 fi
 

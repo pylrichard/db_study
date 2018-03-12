@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 #此脚本需要切换到root下执行
 
@@ -20,11 +20,11 @@ function usage_single() {
 
 [ $# = 0 ] || [ $# = 1 ] || [ $# = 3 ] || [ $# -gt 4 ] && usage
 
-if [ $# = 2 ] && [ $2 != "single" ]
+if [ $# = 2 ]
 then
     [ $2 = "multi" ] && usage_multi
 
-    usage_single
+    [ $2 = "single" ] && usage_single
 fi
 
 function check_param {
@@ -33,7 +33,7 @@ function check_param {
     expr $1 + 0 &>/dev/null
     if [ $? -ne 0 ]
     then
-        echo "$1 should be integer" 
+        echo "$1 should be integer"
         exit
     fi
 
@@ -44,7 +44,14 @@ function check_param {
     fi
 }
 
-if [ $# = 4 ] 
+if [ $# = 3 ]
+then
+    [ $2 != "single" ] && usage_single
+
+    check_param $3
+fi
+
+if [ $# = 4 ]
 then
     [ $2 != "multi" ] && usage_multi
 
@@ -57,6 +64,8 @@ then
         exit
     fi
 fi
+
+#检查参数完毕，开始进行安装并初始化
 
 mysql_dir=$(echo `basename $1` | sed "s/.tar.gz//g")
 #判断MySQL版本
@@ -71,7 +80,7 @@ fi
 #安装依赖软件包
 apt-get -y install libaio1
 
-mysql_install_dir=/usr/local
+mysql_install_dir=/usr/local/mysql
 
 #创建用户组和用户
 echo "\nmysql group and user check\n"
@@ -111,7 +120,7 @@ fi
 mkdir $conf_dir
 cp $(pwd)/my.cnf $conf_dir/my.cnf
 
-mysql_link=mysql_5.6_dir
+mysql_link=mysql_56
 bin_dir=$mysql_install_dir/$mysql_link/bin
 
 #/usr/local/mysql-5.x.x-linux-glibc2.5-x86_64目录存在则不解压
@@ -121,6 +130,7 @@ then
 else
     #解压二进制压缩包
     echo "decompress binary package...\n"
+    mkdir $mysql_install_dir
     tar zxf $1 -C$mysql_install_dir
 
     #切换到/usr/local
@@ -151,7 +161,7 @@ if [ $2 = "multi" ]
 then
     mkdir data{$3..$4}
 else
-    mkdir data_56
+    mkdir data$3
 fi
 
 #data_dir的用户权限为mysql:mysql
@@ -164,9 +174,11 @@ chown -R mysql:mysql .
 function multi_init_mysql() {
     echo "multi init 5.6...\n"
 
+    #$1代表传递给此函数的第1个参数
     for dir_name in data{$1..$2}
     do
-        $bin_dir/../scripts/mysql_install_db --user=mysql --datadir=$data_dir/$dir_name >init_mysql.log 2>&1
+        dir=$data_dir/$dir_name
+        $bin_dir/../scripts/mysql_install_db --user=mysql --datadir=$dir >$data_dir/init_$dir_name.log 2>&1
         sleep 2
     done
 }
@@ -174,11 +186,17 @@ function multi_init_mysql() {
 function single_init_mysql() {
     echo "single init 5.6...\n"
 
-    $bin_dir/../scripts/mysql_install_db --user=mysql --datadir=$data_dir/data_56 >init_mysql.log 2>&1
+    dir=$data_dir/data$1
+    #注意init_data$1.log不能存放在$dir数据目录下，否则会报初始化错误
+    #错误信息输出到init_data$1.log
+    #先把标准输出重定向到文件，再把标准错误重定向到标准输出
+    $bin_dir/../scripts/mysql_install_db --user=mysql --datadir=$dir >$data_dir/init_data$1.log 2>&1
 }
 
+#初始化
 if [ $2 = "multi" ]
 then
+    #将数据目录编号作为参数传递
     multi_init_mysql $3 $4
 else
     single_init_mysql
@@ -190,7 +208,7 @@ chown -R root .
 cp $mysql_install_dir/$mysql_link/support-files/mysql*.server /etc/init.d/$ctrl_script
 
 #启动实例
-echo "start mysql..."
+echo "\nstart mysql...\n"
 if [ $2 = "multi" ]
 then
     $bin_dir/mysqld_multi start
@@ -209,14 +227,12 @@ if [ $2 = "multi" ]
 then
     for num in {$3..$4}
     do
-        $bin_dir/mysql -uroot -S/tmp/mysql.sock$num -e"grant all privileges on *.* to root@'127.0.0.1' identified by '$password' with grant option;
-                                                    grant all privileges on *.* to root@'localhost' identified by '$password' with grant option;
+        $bin_dir/mysql -uroot -S/tmp/mysql.sock$num -e"grant all privileges on *.* to root@'%' identified by '$password' with grant option;
                                                     create user 'multi_admin'@'localhost' identified by '$password';
                                                     grant shutdown on *.* to 'multi_admin'@'localhost';";
     done
 else
-    $bin_dir/mysql -uroot -e "grant all privileges on *.* to root@'127.0.0.1' identified by '$password' with grant option;
-                            grant all privileges on *.* to root@'localhost' identified by '$password' with grant option;";
+    $bin_dir/mysql -uroot -e "grant all privileges on *.* to root@'%' identified by '$password' with grant option;";
 fi
 
 exit
