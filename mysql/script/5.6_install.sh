@@ -26,7 +26,7 @@ systemctl start mysql.server.service
 查看日志
 journalctl -f
 
-systemctl list-units |grep mysql
+systemctl list-units | grep mysql
 '
 
 #
