@@ -2,10 +2,8 @@
 
 #此脚本需要切换到root下执行
 
-'
-/usr/lib/systemd/下新建system目录
-
-vim /usr/lib/systemd/system/mysql.server.service
+<<COMMENT
+vim /etc/systemd/system/mysql.server.service
 [Unit]
 Description=mysql.server.service
 SourcePath=/etc/init.d/mysql.server
@@ -27,7 +25,7 @@ systemctl start mysql.server.service
 journalctl -f
 
 systemctl list-units | grep mysql
-'
+COMMENT
 
 #
 #判断脚本执行时所带的参数是否符合规范
