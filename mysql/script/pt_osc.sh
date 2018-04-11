@@ -11,20 +11,22 @@ table_name=""
 
 case "$1" in
     '1' )
-	#sql_statement="add index ux_order_sn(order_sn)"
+    	#sql_statement="add index ux_order_sn(order_sn)"
         sql_statement="drop index ux_order_sn"
-	db_name=mc_orderdb
+	    db_name=mc_orderdb
         table_name=order_master
         ;;
     '2' )
-        #sql_statement="add index i_product_id(product_id)"
+        #一次执行多条SQL
+        #sql_statement="add index i_product_id(product_id),
+                    #add create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'"
         sql_statement="drop index i_product_id"
-	db_name=mc_orderdb
-	table_name=order_cart
+	    db_name=mc_orderdb
+    	table_name=order_cart
         ;;
     * )
-	echo "1st parram error"
-	;;
+	    echo "1st parram error"
+    	;;
 esac
 
 #双引号中可以引用变量和转义字符，单引号则不行

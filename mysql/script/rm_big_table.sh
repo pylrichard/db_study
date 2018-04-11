@@ -1,4 +1,5 @@
 #!/bin/bash
+
 <<COMMENT
 在线删除大表会占用系统IO，进而导致MySQL进程阻塞和主从延时
 1 建立硬链接
@@ -14,7 +15,7 @@ TRUNCATE=/usr/bin/truncate
 #每次删除100M数据
 for i in `seq 11000 -100 10`;
 do
-        sleep 1
-        echo "$TRUNCATE -s ${i}M /var/data/mysql/data1/mc_orderdb/order_detail_old.ibd.bak"
-        $TRUNCATE -s ${i}M /var/data/mysql/data1/mc_orderdb/order_detail_old.ibd.bak
+    sleep 1
+    echo "$TRUNCATE -s ${i}M /var/data/mysql/data1/mc_orderdb/_order_detail_old.ibd.bak"
+    $TRUNCATE -s ${i}M /var/data/mysql/data1/mc_orderdb/_order_detail_old.ibd.bak
 done
