@@ -1,6 +1,13 @@
 #!/bin/bash
+
 <<COMMENT
-要求被修改的表上不能有触发器和外键，必须有主键
+要求旧表必须有主键
+
+pt-osc会在旧表上创建3个触发器，而一个表上不能同时有2个相同类型的触发器
+如果要支持有触发器存在的表是可以实现的，思路是先找到旧表触发器定义，重写旧表触发器，最后将旧表触发器定义应用到新表
+
+旧表有外键需要设置--alter-foreign-keys-method=rebuild_constraints
+
 指定--nodrop-old-table不删除旧表，反复执行此脚本会报错unknown error，观察一段时间后业务没有受到影响，通过rm_big_table.sh删除旧表
 指定--drop-old-table则不会报错unknown error
 COMMENT
@@ -29,5 +36,8 @@ case "$1" in
     	;;
 esac
 
+echo -n "enter your password: "
+read password
+
 #双引号中可以引用变量和转义字符，单引号则不行
-time pt-online-schema-change --alter="${sql_statement}" --chunk-size=2000 --max-load="Threads_running=15" --critical-load="Threads_running=1000" --drop-old-table --charset=utf8 --nocheck-replication-filters --alter-foreign-keys-method=none --check-slave-lag=0 --print --statistics -u$2 -p$3 --host=$4 --execute "D=${db_name},t=${table_name}"
+time pt-online-schema-change --alter="${sql_statement}" --chunk-size=2000 --max-load="Threads_running=15" --critical-load="Threads_running=1000" --drop-old-table --charset=utf8 --nocheck-replication-filters --alter-foreign-keys-method=none --check-slave-lag=0 --print --statistics -u$2 --host=$3 -p${password} --execute "D=${db_name},t=${table_name}"
