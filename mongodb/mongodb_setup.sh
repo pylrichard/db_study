@@ -11,4 +11,5 @@ ln -s /usr/local/mongodb/mongodb-linux-x86_64-ubuntu1604-3.6.6 /usr/local/mongod
 
 mkdir -p /etc/mongodb
 cp mongod.conf /etc/mongodb/
-mongod --config /etc/mongodb/mongod.conf
+#指定bind_ip_all，Compass才可以连接上mongod
+mongod --config /etc/mongodb/mongod.conf --bind_ip_all
